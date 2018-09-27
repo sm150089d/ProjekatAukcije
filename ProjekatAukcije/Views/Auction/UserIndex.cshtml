@@ -1,0 +1,182 @@
+﻿@model PagedList.IPagedList<ProjekatAukcije.Models.Auction>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "UserIndex";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    int temp = 0;
+}
+
+@using (Html.BeginForm("UserIndex", "Auction", FormMethod.Get))
+{
+    <br /><br />
+    <div class="row">
+        @Html.Label("Name of the product", new { @class = "col-md-2 control-label" })
+        <div class="col-sm-2">
+            @Html.TextBox("Search", ViewBag.CurrentFilter as string, new { @class = "form-control mr-sm-2" })
+        </div>
+
+        @Html.Label("Low value of the price", new { @class = "col-md-2 control-label" })
+        <div class="col-sm-2">
+            @Html.TextBox("LowPrice", "", new { @class = "form-control mr-sm-2" })
+        </div>
+
+        @Html.Label("High value of the price", new { @class = "col-md-2 control-label" })
+        <div class="col-sm-2">
+            @Html.TextBox("HighPrice", "", new { @class = "form-control mr-sm-2" })
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        @Html.Label("Status of auction", new { @class = "col-md-2 control-label" })
+        <div class="col-sm-2">
+            @Html.TextBox("Status", "", new { @class = "form-control mr-sm-2" })
+        </div>
+
+        @Html.Label("Number Of Products Page", new { @class = "col-md-2 control-label" })
+        <div class="col-sm-2">
+            @Html.TextBox("NumberOfProductsPage", "", new { @class = "form-control mr-sm-2" })
+        </div>
+
+        <div class="col-sm-2">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </div>
+
+
+        <br />
+}
+<div class="card-deck">
+    @foreach (var auction in Model)
+    {
+        
+            <div class="col-sm-4" >
+                <div class="card border-primary" style="height:100%">
+                    <div class="card-header">
+                        <a href='@Url.Action("AboutAuction", "Auction", new { id = @auction.Id })'>
+                            <div class="card-header text-primary text-center"><h4>@auction.Name</h4></div>
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        @{
+                            string imreBase64Data = Convert.ToBase64String(auction.Picture);
+                            string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
+                        }
+                        <img class="card-img-top img-rounded" src="@imgDataUrl" style="width:100%; height:100%" />
+                        <center style="height:100%">
+                            <h3 class="text-success" id="time@(temp)"></h3>
+                            <h5 class="text-success text-center" id="price@(auction.Id)">@auction.CurrentPrice @auction.Currency</h5>
+                            <p class="card-text" id="name@(auction.Id)">
+                                @if (auction.Bid.LastOrDefault() != null)
+                                {
+                                  <h4>  @auction.Bid.LastOrDefault().User.FirstName</h4><h4> @auction.Bid.LastOrDefault().User.LastName</h4>
+                                }
+                                else
+                                {
+                                    <text>No bids for now!</text>
+                                }
+                            </p>
+                            @using (Html.BeginForm("Pay", "Bid", new { auctionId = auction.Id }, FormMethod.Post, new { role = "form" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" id="btn@(temp)" class="btn btn-primary font-weight-bold" style="color:white">Bid Now!</button>
+                            }
+                        </center>
+                    </div>
+                </div>
+            </div>
+            <br />
+                            if (auction.Status == "COMPLETED")
+                            {
+                                <script>
+                                    document.getElementById("time@(temp)").innerHTML = "COMPLETED";
+                                    document.getElementById("time@(temp)").className = "text-danger";
+                                    document.getElementById("btn@(temp)").setAttribute("disabled","true");
+                                </script>
+                            }
+                            if (auction.Status == "READY")
+                            {
+                                <script>
+                                    document.getElementById("time@(temp)").innerHTML = "READY";
+                                    document.getElementById("time@(temp)").className = "text-info";
+                                    document.getElementById("btn@(temp)").setAttribute("disabled","true");
+                                </script>
+                            }
+                            if (auction.Status == "OPENED")
+                            {
+                                <script>
+
+                                    var countDownDate@(temp) = new Date().getTime() - @((System.DateTime.Now - @auction.DateTimeOpened.Value).TotalMilliseconds) + @auction.Duration* 1000;
+
+                                    var x = setInterval(function() {
+                                        var now = new Date().getTime();
+                                        var distance = countDownDate@(temp) - now;
+
+                                  
+                                        if (distance < 0) {
+                                            clearInterval(x);
+                                            document.getElementById("time@(temp)").className = "text-danger";
+                                            document.getElementById("btn@(temp)").setAttribute("disabled", "true");
+                                            document.getElementById("time@(temp)").innerHTML = "COMPLETED";
+
+                                            $.ajax({
+                                                type: "POST",
+                                                url: '@Url.Action("Close", "Auction", new { id = auction.Id })',
+                                                dataType: "json",
+                                                contentType: "application/json; charset=utf-8",
+                                                success: function () { }
+                                            });
+                                            return;
+                                        }
+
+                                        var d = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                        var h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                        var m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                        var s = Math.floor((distance % (1000 * 60)) / 1000);
+                                        document.getElementById("time@(temp)").innerHTML = d + ": " + h + ":" + m + ":" + s;
+                                    }, 1000);
+
+                                </script>
+                            }
+                            
+                               
+
+                                    ++temp;
+
+                                
+                            }
+</div>
+
+
+
+ Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("UserIndex",
+    new { page, currentFilter = ViewBag.CurrentFilter, lowPrice = ViewBag.Low, highPrice = ViewBag.High, status = ViewBag.Status, NumberOfProductsPage = ViewBag.NumberOfProductsPage }))
+
+@section scripts {
+    <script src="~/Scripts/jquery.signalR-2.3.0.min.js"></script>
+    <script src="~/signalr/js"></script>
+    <script>
+            var auctions = $.connection.auctionsHub;
+            $.connection.hub.start().done(function () {
+
+            });
+            auctions.client.userIndex = function (id, price, currency, firstName, lastName) {
+                var element = "price" + id;
+                document.getElementById(element).innerHTML = price + " " + currency;
+                element = "name" + id;
+                document.getElementById(element).innerHTML = firstName + " " + lastName;
+            
+            };
+
+
+       
+    </script>
+}
+
+
+
+

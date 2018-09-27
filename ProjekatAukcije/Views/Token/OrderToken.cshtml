@@ -1,0 +1,69 @@
+﻿@model ProjekatAukcije.Models.Admin
+@{
+    ViewBag.Title = "OrderToken";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ProjekatAukcije.Models.DefaultConnection db = new ProjekatAukcije.Models.DefaultConnection();
+    ProjekatAukcije.Models.Admin admin = db.Admin.FirstOrDefault();
+}
+
+<h1 align="center"><b>OrderToken</b></h1>
+
+<div class="row">
+
+
+    <div class="col-md-4">
+        <div class="card-deck">
+            <center>
+                @using (Html.BeginForm("Order", "Token", new { number = 1 }, FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <button style="border-color:black; border-width:medium">
+                        <img align="top" width="225" height="225" src="https://i.ebayimg.com/images/g/MNEAAOSwSrNaTlhj/s-l300.jpg" />
+                    </button>
+                }
+
+                <h2 class="text-center">SILVER TOKEN</h2>
+                <h3 class="text-success text-center"> Package of: @admin.SilverPackTokens</h3>
+                <h3 class="text-success text-center"> Cost: @(admin.SilverPackTokens * admin.ValueOfToken) @admin.Currency</h3>
+            </center>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card-deck">
+            <center>
+                @using (Html.BeginForm("Order", "Token", new { number = 2 }, FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <button style="border-color:black; border-width:medium">
+                        <img align="top" width="225" height="225" src="https://goldma.io/assets/images/section/gma_token_final_1.png" />
+                    </button>
+                }
+                <h2 class="text-center">GOLD TOKEN</h2>
+                <h3 class="text-success text-center"> Package of: @admin.GoldPackTokens</h3>
+                <h3 class="text-success text-center"> Cost: @(admin.GoldPackTokens * admin.ValueOfToken) @admin.Currency</h3>
+            </center>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card-deck">
+            <center>
+                @using (Html.BeginForm("Order", "Token", new { number = 3 }, FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <button style="border-color:black; border-width:medium">
+                        <img align="top" width="225" height="225" src="https://www.blackmountaincoins.com/media/catalog/product/cache/1/image/512x512/9df78eab33525d08d6e5fb8d27136e95/1/9/1960_exo_12461_1.jpg" />
+                    </button>
+                }
+                <h2 class="text-center">PLATINUM TOKEN</h2>
+                <h3 class="text-success text-center"> Package of: @admin.PlatinumPackTokens</h3>
+                <h3 class="text-success text-center"> Cost: @(admin.PlatinumPackTokens * admin.ValueOfToken) @admin.Currency</h3>
+            </center>
+        </div>
+    </div>
+
+</div>

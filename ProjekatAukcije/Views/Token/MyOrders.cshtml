@@ -1,0 +1,37 @@
+﻿@model PagedList.IPagedList<ProjekatAukcije.Models.TokenOrder>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "MyOrders";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h1 align="center">These are your auctions:</h1>
+
+<table class="table table-hover">
+    <thead>
+        <tr class="table-primary">
+            <th >TYPE OF TOKENS</th>
+            <th ><b>NUMBER OF TOKENS</b></th>
+            <th ><b>STATUS</b></th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model)
+        {
+            <tr class="table-secondary">
+                <td>@Html.DisplayFor(model => t.TypeOfTokens)</td>
+                <td>@Html.DisplayFor(model => t.NumberOfTokens)</td>
+                <td>@Html.DisplayFor(model => t.Status)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<br />
+
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("MyOrders", new { page }))

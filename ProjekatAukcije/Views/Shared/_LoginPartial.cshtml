@@ -1,0 +1,48 @@
+﻿@using Microsoft.AspNet.Identity
+
+@if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <ul class="nav navbar-nav">
+
+            <li>@Html.ActionLink("Edit Account", "Edit", "Account")</li>
+
+            <li>@Html.ActionLink("New auction", "NewAuction", "Account")</li>
+
+            <li>@Html.ActionLink("Token order", "OrderToken", "Token")</li>
+
+            <li>@Html.ActionLink("My token orders", "MyOrders", "Token")</li>
+
+            <li>@Html.ActionLink("My won auctions", "WonAuctions", "Account")</li>
+
+            <li><a href="javascript:document.getElementById('logoutForm').submit()">Log out</a></li>
+        </ul>
+    }
+}
+else {
+    if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <ul class="nav navbar-nav">
+                <li>@Html.ActionLink("Add new values", "Admin", "Admin")</li>
+                <li>@Html.ActionLink("Set opened", "Set", "Admin")</li>
+                <li><a href="javascript:document.getElementById('logoutForm').submit()">Log out</a></li>
+            </ul>
+        }
+    }
+    else
+    {
+        <ul class="nav navbar-nav">
+            <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+          
+            <li>@Html.ActionLink(" Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+        </ul>
+    }
+}
+

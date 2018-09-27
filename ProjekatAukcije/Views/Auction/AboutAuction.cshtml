@@ -1,0 +1,158 @@
+﻿@model ProjekatAukcije.Models.Auction
+@{
+    ViewBag.Title = "AboutAuction";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ICollection<ProjekatAukcije.Models.Bid> bids = Model.Bid;
+    ProjekatAukcije.Models.DefaultConnection db = new ProjekatAukcije.Models.DefaultConnection();
+
+}
+<div class="row">
+<div class="col-sm-4">
+    <div class="card">
+        <div class="card-header text-primary text-center">
+            <h4><b> @Model.Name </b> </h4>
+
+            <div class="card-body">
+                @{
+                    string imreBase64Data = Convert.ToBase64String(Model.Picture);
+                    string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
+                }
+                <img class="card-img-top img-rounded" src="@imgDataUrl" style="width:100%" />
+                <center>
+                    <h3 class="text-success" id="time"></h3>
+                    <h5 class="text-success text-center" id="price">@Model.CurrentPrice @Model.Currency</h5>
+                    <h5 class="text-success text-center" id="priceT">Price in tokens: @Model.PriceInTokens </h5>
+                    <p class="card-text" id="name">
+                        @if (Model.Bid.LastOrDefault() != null)
+                        {
+                          <h4>  @Model.Bid.LastOrDefault().User.FirstName</h4><h4> @Model.Bid.LastOrDefault().User.LastName</h4>
+                        }
+                        else
+                        {
+                            <text>No bids for now!</text>
+                        }
+                    </p>
+                    @using (Html.BeginForm("Pay", "Bid", new { auctionId = Model.Id }, FormMethod.Post, new { role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit" id="btn" class="btn btn-primary font-weight-bold" style="color:white">Bid Now!</button>
+                    }
+                </center>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-8">
+    <table class="table table-hover">
+        <tr class="table-primary">
+            <th>Korisnik koji je poslao ponudu</th>
+            <th>Vreme slanja ponude</th>
+            <th>Broj tokena koji su uloženi</th>
+        </tr>
+        @foreach (var bid in bids)
+            {
+            <tr class="table-secondary">
+                <td>
+                    @{  ProjekatAukcije.Models.User user = db.User.Where(u => u.Id == bid.UserId).FirstOrDefault();
+                    }
+                    @Html.DisplayFor(model => user.FirstName)
+                    @Html.DisplayFor(model => user.LastName)
+                </td>
+                <td>@Html.DisplayFor(model => bid.TimeStarted)</td>
+                <td>@Html.DisplayFor(model => bid.NumberOfTokens)</td>
+            </tr>
+                        }
+    </table>
+</div>
+</div>
+@if (Model.Status == "COMPLETED")
+{
+    <script>
+        document.getElementById("time").innerHTML = "COMPLETED";
+        document.getElementById("time").className = "text-danger";
+        document.getElementById("btn").setAttribute("disabled","true");
+    </script>
+}
+@if (Model.Status == "READY")
+{
+    <script>
+        document.getElementById("time").innerHTML = "READY";
+        document.getElementById("time").className = "text-info";
+        document.getElementById("btn").setAttribute("disabled","true");
+    </script>
+}
+@if (Model.Status == "OPENED")
+{
+    <script>
+
+        var countDownDate = new Date().getTime() - @((System.DateTime.Now - @Model.DateTimeOpened.Value).TotalMilliseconds) + @Model.Duration* 1000;
+
+        var x = setInterval(function() {
+            var now = new Date().getTime();
+            var distance = countDownDate - now;
+
+          //  if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+          //      document.getElementById("btn").setAttribute("disabled","true");
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("time").className = "text-danger";
+                document.getElementById("btn").setAttribute("disabled", "true");
+                document.getElementById("time").innerHTML = "COMPLETED";
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("CloseAbout", "Auction", new { id = Model.Id })',
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function () { }
+                });
+                return;
+            }
+
+            var d = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var s = Math.floor((distance % (1000 * 60)) / 1000);
+            document.getElementById("time").innerHTML = d + ": " + h + ":" + m + ":" + s;
+        }, 1000);
+
+    </script>
+}
+
+
+
+@section scripts {
+    <script src="~/Scripts/jquery.signalR-2.3.0.min.js"></script>
+    <script src="~/signalr/js"></script>
+    <script>
+        $(function () {
+            var auctions = $.connection.auctionsHub;
+            $.connection.hub.start().done(function () {
+
+            });
+
+            auctions.client.newBid = function (Fname, Lname, time, tokens, currentPrice) {
+                var table = document.getElementById("last");
+                var row = table.insertRow(1);
+                var c1 = row.insertCell(0);
+                var c2 = row.insertCell(1);
+                var c3 = row.insertCell(2);
+                var c4 = row.insertCell(3);
+                var c5 = row.insertCell(4);
+                c1.innerHTML = Fname;
+                c2.innerHTML = Lname;
+                c3.innerHTML = time;
+                c4.innerHTML = tokens;
+                c5.innerHTML = currentPrice;
+                document.getElementById("price").innerHTML = currentPrice;
+                document.getElementById("priceT").innerHTML = tokens;
+                document.getElementById("name").innerHTML = Fname + " " + Lname;
+            };
+
+
+        });
+    </script>
+}
+
+

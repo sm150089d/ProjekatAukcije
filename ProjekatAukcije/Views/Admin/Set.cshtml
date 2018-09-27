@@ -1,0 +1,45 @@
+﻿@model PagedList.IPagedList<ProjekatAukcije.Models.Auction>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "Set";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<h1 align="center">These are auctions:</h1>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th style="color:red">NAME OF THE AUCTION</th>
+            <th style="color:red"><b>SET TO OPENED</b></th>
+            
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(model => a.Name)</td>
+                <td>
+                    @using (Html.BeginForm("SetOpened", "Admin", new { id = a.Id }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <input type="submit" value="Set to opened" class="btn btn-primary" />
+                            </div>
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<br />
+
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Set", new { page }))

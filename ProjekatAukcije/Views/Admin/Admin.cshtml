@@ -1,0 +1,74 @@
+﻿@model ProjekatAukcije.Models.AdminViewModel
+@{
+    ViewBag.Title = "Admin";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+
+@using (Html.BeginForm("Index", "Admin", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <br /><br />
+    <div class="row">
+        @Html.Label("Number of products per page", new { @class = "col-md-2 control-label" })
+        <div class="col-sm-2">
+            @Html.TextBox("NumberOfProductsPage", ViewBag.CurrentFilter as string, new { @class = "form-control mr-sm-2" })
+            @Html.ValidationMessageFor(m=>m.NumberOfProductsPage, "", new { @class = "text-danger" })
+        </div>
+    </div>
+        <br />
+        <div class="row">
+            @Html.Label("Default duration of auction", new { @class = "col-md-2 control-label" })
+            <div class="col-sm-2">
+                @Html.TextBox("DefaultAuctionDuration", "", new { @class = "form-control mr-sm-2" })
+                @Html.ValidationMessageFor(m=>m.DefaultAuctionDuration, " ", new { @class = "text-danger" })
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            @Html.Label("Silver pack tokens", new { @class = "col-md-2 control-label" })
+            <div class="col-sm-2">
+                @Html.TextBox("Silver", "", new { @class = "form-control mr-sm-2" })
+                @Html.ValidationMessageFor(m=>m.Silver, " ", new { @class = "text-danger" })
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            @Html.Label("Gold pack tokens", new { @class = "col-md-2 control-label" })
+            <div class="col-sm-2">
+                @Html.TextBox("Gold", "", new { @class = "form-control mr-sm-2" })
+                @Html.ValidationMessageFor(m=>m.Gold, " ", new { @class = "text-danger" })
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            @Html.Label("Platinum pack tokens", new { @class = "col-md-2 control-label" })
+            <div class="col-sm-2">
+                @Html.TextBox("Platinum", "", new { @class = "form-control mr-sm-2" })
+                @Html.ValidationMessageFor(m=>m.Platinum, " ", new { @class = "text-danger" })
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            @Html.Label("Currency", new { @class = "col-md-2 control-label" })
+            <div class="col-sm-2">
+                @Html.TextBox("Currency", "", new { @class = "form-control mr-sm-2" })
+                @Html.ValidationMessageFor(m => m.Currency, " ", new { @class = "text-danger" })
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            @Html.Label("Value of token", new { @class = "col-md-2 control-label" })
+            <div class="col-sm-2">
+                @Html.TextBox("ValueOfToken", ViewBag.CurrentFilter as string, new { @class = "form-control mr-sm-2" })
+                @Html.ValidationMessageFor(m=>m.ValueOfToken, " ", new { @class = "text-danger" })
+            </div>
+        </div>
+        <br />
+            <div class="row">
+                <div class="col-sm-2">
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </div>
+}
+

@@ -1,0 +1,30 @@
+﻿@model ProjekatAukcije.Models.Auction
+
+@{
+    ViewBag.Title = "Payment";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+
+<br /><br />
+<h1 align="center">@Html.Label("UNESITE KOLIČINU TOKENA KOJI ULAŽETE U AUKCIJU:", new { @class = "col-md-12 control-label" })</h1>
+<br /><br />
+@using (Html.BeginForm("Payment", "Bid", new { auctionId = Model.Id, amount = ViewBag.Amount }, FormMethod.Post, new { role = "form" }))
+{
+
+    <div class="row">
+        <div class="col-md-12" align="center">
+            @Html.TextBox("Amount", ViewBag.Amount as int?, new { @class = "form-control" })
+        </div>
+    </div>
+    <br /><br />
+    <div class="row">
+        <div class="col-md-12" align="center">
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Submit" class="btn btn-primary" />
+                </div>
+            </div>
+        </div>
+    </div>
+}

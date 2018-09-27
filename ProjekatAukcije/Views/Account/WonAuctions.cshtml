@@ -1,0 +1,94 @@
+﻿@model PagedList.IPagedList<ProjekatAukcije.Models.Auction>
+@using PagedList.Mvc;
+@using Microsoft.AspNet.Identity;
+@using ProjekatAukcije.Models;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+@{
+    ViewBag.Title = "WonAuctions";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    DefaultConnection db = new DefaultConnection();
+    string userId = User.Identity.GetUserId();
+    User user = db.User.Where(u => u.idAspNetUsers == userId).FirstOrDefault();
+
+    int current = 0;
+
+}
+
+<h2 align="center">My Won Auctions</h2>
+
+@using (Html.BeginForm("WonAuctions", "Account", FormMethod.Get))
+{
+    <br /><br />
+    <div class="row">
+        @Html.Label("Name of the product", new { @class = "col-md-2 control-label" })
+        <div class="col-sm-2">
+            @Html.TextBox("Search", ViewBag.CurrentFilter as string, new { @class = "form-control mr-sm-2" })
+        </div>
+
+        @Html.Label("Low value of the price", new { @class = "col-md-2 control-label" })
+        <div class="col-sm-2">
+            @Html.TextBox("LowPrice", "", new { @class = "form-control mr-sm-2" })
+        </div>
+
+        @Html.Label("High value of the price", new { @class = "col-md-2 control-label" })
+        <div class="col-sm-2">
+            @Html.TextBox("HighPrice", "", new { @class = "form-control mr-sm-2" })
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        @Html.Label("Number Of Products Page", new { @class = "col-md-2 control-label" })
+        <div class="col-sm-2">
+            @Html.TextBox("NumberOfProductsPage", "", new { @class = "form-control mr-sm-2" })
+        </div>
+
+        <div class="col-sm-2">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </div>
+
+
+    <br />
+}
+
+<div class="card-deck">
+    @foreach (var auction in Model)
+    {
+        if (current < ViewBag.NumberOfProductsPage)
+        {
+            <div class="col-sm-3">
+                <div class="card" style="height:100%">
+                    <div class="card-header">
+                        <a href='@Url.Action("About", "Account", new { id = @auction.Id })'>
+                            <div class="card-header text-primary text-center"><h4>@auction.Name</h4></div>
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        @{
+                            string imreBase64Data = Convert.ToBase64String(auction.Picture);
+                            string imgDataUrl = string.Format("data:image/png;base64,{0}", imreBase64Data);
+                        }
+                        <img class="card-img-top img-rounded" src="@imgDataUrl" style="width:100%" />
+                        <center>
+                            <h3 class="text-success">COMPLETED</h3>
+                            <h5 class="text-success text-center">@auction.CurrentPrice @auction.Currency</h5>
+                            <p class="card-text">
+                              <h4>  @user.FirstName</h4><h4> @user.LastName</h4>
+                            </p>
+                            <button type="submit" class="btn btn-primary disabled font-weight-bold" style="color:white">Bid Now!</button>
+
+                        </center>
+                    </div>
+                </div>
+            </div>
+                                    current++;
+                                }
+                            }
+</div>
+                            
+
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("WonAuctions",
+    new { page, currentFilter = ViewBag.CurrentFilter, lowPrice = ViewBag.Low, highPrice = ViewBag.High, status = ViewBag.Status, NumberOfProductsPage = ViewBag.NumberOfProductsPage }))
+
